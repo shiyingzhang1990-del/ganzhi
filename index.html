@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#b03a2e">
+<meta name="description" content="天干地支知识卡片与个人测算：十天干、十二地支、五行生克、六十甲子，推算四柱、流年、流月运势。">
+<title>天干地支 · 知识卡片与个人测算</title>
+<style>
+:root{
+  --paper:#f7f1e3; --paper2:#efe6cf; --ink:#2b231a; --sub:#7a6a55;
+  --line:#e4d8bf; --cinnabar:#b03a2e; --cinnabar2:#8f2f24;
+  --gold:#b8923a; --gold-soft:#f3e6c4;
+  --radius:16px;
+  --shadow:0 1px 3px rgba(60,45,20,.08),0 4px 16px rgba(60,45,20,.06);
+  --serif:"Noto Serif SC","Songti SC","STSong","SimSun",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  --wx-m:#2e7d5b; --wx-h:#b03a2e; --wx-t:#b8923a; --wx-j:#9a8a5a; --wx-s:#2e5f8a;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--sans); background:var(--paper); color:var(--ink);
+  font-size:16px; line-height:1.75; -webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(circle at 15% 10%, rgba(184,146,58,.05), transparent 40%),
+    radial-gradient(circle at 85% 90%, rgba(176,58,46,.04), transparent 40%);
+}
+.wrap{max-width:860px;margin:0 auto;padding:0 14px 120px}
+
+/* header */
+header{position:sticky;top:0;z-index:60;background:rgba(247,241,227,.92);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:14px 16px 10px}
+.brand{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.brand .tri{font-size:22px;color:var(--cinnabar)}
+.brand h1{font-family:var(--serif);font-size:20px;margin:0;letter-spacing:1px;font-weight:800}
+.brand .en{font-size:12px;color:var(--sub);letter-spacing:2px}
+.nav{display:flex;gap:6px;margin-top:10px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav button{flex:0 0 auto;border:1px solid var(--line);background:#fbf6ea;color:var(--sub);
+  padding:7px 15px;border-radius:999px;font-size:13.5px;cursor:pointer;white-space:nowrap;font-family:var(--sans)}
+.nav button.on{background:var(--ink);border-color:var(--ink);color:#f7f1e3;font-weight:600}
+
+/* hero */
+.hero{text-align:center;padding:30px 8px 6px}
+.hero .bagua{font-size:30px;letter-spacing:4px;color:var(--gold);margin-bottom:8px}
+.hero h2{font-family:var(--serif);font-size:28px;margin:0 0 10px;letter-spacing:2px}
+.hero p.lead{font-size:15px;color:var(--sub);max-width:600px;margin:0 auto 8px}
+.hero p.note{font-size:12px;color:var(--cinnabar);opacity:.85;margin:0 auto}
+
+/* sections */
+.view{display:none}
+.view.on{display:block;animation:fade .4s ease}
+
+.sec{margin-top:30px}
+.sec-h{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.sec-h .g{font-size:26px;line-height:1}
+.sec-h h3{font-family:var(--serif);font-size:20px;margin:0;letter-spacing:1px}
+.sec-h .en{font-size:11px;color:var(--sub);letter-spacing:2px}
+
+/* overview card */
+.ov{background:#fffdf6;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px}
+.ov p{margin:0 0 10px;font-size:14.5px;color:#3a2f22;text-align:justify}
+.ov p:last-child{margin:0}
+.ov b{color:var(--cinnabar)}
+
+/* gan/zhi grid */
+.gz-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+@media(max-width:600px){.gz-grid{grid-template-columns:repeat(2,1fr)}}
+.gz{background:#fffdf6;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:12px 10px;text-align:center}
+.gz .c{font-family:var(--serif);font-size:30px;font-weight:800;line-height:1;margin-bottom:6px}
+.gz .tags{display:flex;justify-content:center;gap:5px;margin-bottom:6px;flex-wrap:wrap}
+.gz .tag{font-size:11px;padding:1px 8px;border-radius:999px;color:#fff;font-weight:600}
+.gz .sx{font-size:12px;color:var(--sub);margin-bottom:4px}
+.gz .yi{font-size:11.5px;color:#4a3d2c;line-height:1.5;text-align:left}
+
+/* 五行生克 */
+.wx-wrap{display:flex;flex-direction:column;gap:12px}
+.wx-row{background:#fffdf6;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px}
+.wx-row .lbl{font-size:13px;font-weight:800;color:var(--gold);letter-spacing:1px;margin-bottom:10px}
+.wx-flow{display:flex;align-items:center;flex-wrap:wrap;gap:4px}
+.wx-chip{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;
+  border-radius:50%;color:#fff;font-family:var(--serif);font-size:20px;font-weight:800;box-shadow:var(--shadow)}
+.wx-arrow{color:var(--sub);font-size:14px;margin:0 4px}
+
+/* 六十甲子 */
+.jz-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:6px}
+@media(max-width:600px){.jz-grid{grid-template-columns:repeat(5,1fr)}}
+.jz{background:#fffdf6;border:1px solid var(--line);border-radius:9px;padding:7px 2px;text-align:center;font-size:13px}
+.jz .n{display:block;font-size:9px;color:var(--sub);line-height:1}
+
+/* 纪法说明 */
+.jifa{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(max-width:600px){.jifa{grid-template-columns:1fr}}
+.jifa .card{background:#fffdf6;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px}
+.jifa .card b{font-family:var(--serif);color:var(--cinnabar);font-size:15px}
+.jifa .card p{margin:6px 0 0;font-size:13px;color:#4a3d2c;text-align:justify}
+
+/* calculator form */
+.calc-form{background:#fffdf6;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px}
+.calc-form .row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.calc-form .fld{flex:1;min-width:100px}
+.calc-form label{display:block;font-size:12px;color:var(--sub);font-weight:600;margin-bottom:5px}
+.calc-form select,.calc-form input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;
+  background:#fff;color:var(--ink);font-size:15px;font-family:var(--sans)}
+.calc-form select:focus,.calc-form input:focus{outline:none;border-color:var(--gold)}
+.btn{display:inline-block;border:none;cursor:pointer;border-radius:999px;font-size:15px;font-weight:700;
+  padding:12px 32px;font-family:var(--sans);letter-spacing:1px}
+.btn-primary{background:var(--cinnabar);color:#f7f1e3;box-shadow:var(--shadow)}
+.btn-primary:hover{background:var(--cinnabar2)}
+.calc-form .submit{text-align:center;margin-top:4px}
+
+/* bazi result */
+.bazi{display:none;margin-top:24px}
+.bazi.show{display:block;animation:fade .5s ease}
+.pillars{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:600px){.pillars{grid-template-columns:repeat(2,1fr)}}
+.pillar{background:#fffdf6;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:14px 10px;text-align:center}
+.pillar .pl{font-size:11px;color:var(--sub);font-weight:700;letter-spacing:1px;margin-bottom:6px}
+.pillar .gz{font-family:var(--serif);font-size:26px;font-weight:800;letter-spacing:2px}
+.pillar .gz .g{color:var(--ink)}
+.pillar .gz .z{color:var(--cinnabar)}
+.pillar .meta{font-size:11px;color:var(--sub);margin-top:5px}
+.pillar.day-master{border-color:var(--cinnabar);background:#fbf0ec}
+.pillar.day-master .pl{color:var(--cinnabar)}
+.pillar .dm{display:inline-block;font-size:11px;color:#fff;background:var(--cinnabar);border-radius:999px;padding:1px 9px;margin-top:5px}
+
+/* 五行分布 */
+.wx-dist{margin-top:16px;background:#fffdf6;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px}
+.wx-dist .bars{display:flex;gap:8px;margin-top:10px}
+.wx-dist .bar{flex:1;text-align:center}
+.wx-dist .bar .lb{font-size:12px;font-weight:700;margin-bottom:4px}
+.wx-dist .bar .tr{height:8px;background:var(--paper2);border-radius:4px;overflow:hidden}
+.wx-dist .bar .tr i{display:block;height:100%;border-radius:4px}
+.wx-dist .bar .ct{font-size:11px;color:var(--sub);margin-top:4px}
+.wx-dist .miss{margin-top:10px;font-size:13px;color:var(--sub)}
+.wx-dist .miss b{color:var(--cinnabar)}
+
+/* 流年 */
+.ln-sec{margin-top:22px}
+.ln-sec .ln-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.ln-sec .ln-head select{padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;font-size:14px;font-family:var(--sans)}
+.ln-card{background:#fffdf6;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px}
+.ln-card .ln-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.ln-card .ln-gz{font-family:var(--serif);font-size:32px;font-weight:800;letter-spacing:2px}
+.ln-card .ln-gz .z{color:var(--cinnabar)}
+.ln-card .ln-ss{font-size:13px;color:#fff;background:var(--cinnabar);border-radius:999px;padding:3px 13px;font-weight:700}
+.ln-card .ln-sub{font-size:12.5px;color:var(--sub);margin-top:4px}
+.ln-card .ln-body{margin-top:12px;border-top:1px dashed var(--line);padding-top:12px}
+.ln-card .ln-body .row{margin-bottom:7px;font-size:14px;color:#3a2f22}
+.ln-card .ln-body .row b{color:var(--cinnabar)}
+.ln-card .ln-body .row.ji b{color:var(--gold)}
+
+/* 流月 */
+.lm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+@media(max-width:700px){.lm-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:420px){.lm-grid{grid-template-columns:1fr}}
+.lm{background:#fffdf6;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:12px 13px}
+.lm .lm-top{display:flex;align-items:baseline;gap:6px;margin-bottom:4px}
+.lm .lm-m{font-size:12px;color:var(--sub);font-weight:700}
+.lm .lm-gz{font-family:var(--serif);font-size:19px;font-weight:800;letter-spacing:1px}
+.lm .lm-gz .z{color:var(--cinnabar)}
+.lm .lm-ss{display:inline-block;font-size:11px;color:#fff;background:var(--gold);border-radius:999px;padding:1px 9px;margin-bottom:6px}
+.lm .lm-t{font-size:12px;color:#4a3d2c;line-height:1.55}
+.lm .lm-t b{color:var(--cinnabar)}
+.lm .lm-t span.ji{color:var(--gold)}
+
+.foot{text-align:center;color:var(--sub);font-size:12px;margin-top:40px;line-height:1.8}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand"><span class="tri">☯</span><h1 id="h1"></h1></div>
+  <div class="nav" id="nav">
+    <button data-v="kb" class="on">📜 知识卡片</button>
+    <button data-v="calc">🧮 个人测算</button>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="bagua" id="bagua"></div>
+  <h2 id="heroTitle"></h2>
+  <p class="lead" id="heroLead"></p>
+  <p class="note" id="heroNote"></p>
+</div>
+
+<!-- 知识卡片 -->
+<div class="view on" id="view-kb">
+  <div class="sec" id="sec-overview">
+    <div class="sec-h"><span class="g">☰</span><h3>什么是天干地支</h3></div>
+    <div class="ov" id="ov"></div>
+  </div>
+
+  <div class="sec" id="sec-gan">
+    <div class="sec-h"><span class="g">🌳</span><h3>十天干</h3><span class="en">十干 · 阴阳五行</span></div>
+    <div class="gz-grid" id="ganGrid"></div>
+  </div>
+
+  <div class="sec" id="sec-zhi">
+    <div class="sec-h"><span class="g">🐲</span><h3>十二地支</h3><span class="en">十二支 · 生肖 · 月令 · 时辰</span></div>
+    <div class="gz-grid" id="zhiGrid"></div>
+  </div>
+
+  <div class="sec" id="sec-wx">
+    <div class="sec-h"><span class="g">🔥</span><h3>五行生克</h3><span class="en">相生 · 相克</span></div>
+    <div class="wx-wrap" id="wxWrap"></div>
+  </div>
+
+  <div class="sec" id="sec-jz">
+    <div class="sec-h"><span class="g">⚙️</span><h3>六十甲子</h3><span class="en">干支相配 · 六十年一轮</span></div>
+    <div class="jz-grid" id="jzGrid"></div>
+  </div>
+
+  <div class="sec" id="sec-jifa">
+    <div class="sec-h"><span class="g">🗓️</span><h3>干支纪年 · 月 · 日 · 时</h3></div>
+    <div class="jifa" id="jifa"></div>
+  </div>
+</div>
+
+<!-- 个人测算 -->
+<div class="view" id="view-calc">
+  <div class="sec">
+    <div class="sec-h"><span class="g">🧮</span><h3>输入出生信息</h3></div>
+    <div class="calc-form">
+      <div class="row">
+        <div class="fld"><label>出生年份</label><input id="inY" type="number" min="1900" max="2100" value="1990"></div>
+        <div class="fld"><label>出生月份</label><select id="inM"></select></div>
+        <div class="fld"><label>出生日期</label><input id="inD" type="number" min="1" max="31" value="1"></div>
+        <div class="fld"><label>出生时辰</label><select id="inH"></select></div>
+      </div>
+      <div class="submit"><button class="btn btn-primary" id="calcBtn">开始测算</button></div>
+    </div>
+  </div>
+
+  <div class="bazi" id="bazi">
+    <div class="sec-h"><span class="g">📿</span><h3>你的四柱</h3><span class="en">年柱 · 月柱 · 日柱 · 时柱</span></div>
+    <div class="pillars" id="pillars"></div>
+    <div class="wx-dist" id="wxDist"></div>
+  </div>
+
+  <div class="ln-sec" id="lnSec" style="display:none">
+    <div class="sec-h"><span class="g">🌊</span><h3>流年运势</h3><span class="en">每年走什么运</span></div>
+    <div class="ln-head">
+      <span style="font-size:13px;color:var(--sub)">选择年份</span>
+      <select id="yearSel"></select>
+    </div>
+    <div class="ln-card" id="lnCard"></div>
+  </div>
+
+  <div class="ln-sec" id="lmSec" style="display:none">
+    <div class="sec-h"><span class="g">🌙</span><h3>流月运势</h3><span class="en">每月注意什么</span></div>
+    <div class="lm-grid" id="lmGrid"></div>
+  </div>
+</div>
+
+<div class="foot" id="foot"></div>
+</div>
+
+<script>
+const DATA = {"title": "天干地支 · 知识卡片与个人测算", "subtitle": "十天干 · 十二地支 · 五行生克 · 六十甲子，并据此推算你的四柱、流年与流月运势", "hero": {"bagua": "甲乙丙丁戊己庚辛壬癸", "title": "天干地支", "lead": "干支纪年、月、日、时，是中华历法与命理的基础。这里既讲清楚「是什么」，也帮你算出属于自己的干支命盘。", "note": "本工具为简化估算（精确排盘需按节气交节时刻），结果仅供娱乐与启发，不构成任何决策建议。"}, "gan": [{"c": "甲", "yy": "阳", "wx": "木", "yi": "参天大树，刚健向上，主开创、领导与担当"}, {"c": "乙", "yy": "阴", "wx": "木", "yi": "花草藤蔓，柔韧蜿蜒，主适应、生长与灵动"}, {"c": "丙", "yy": "阳", "wx": "火", "yi": "太阳之火，光明普照，主热情、活力与感召"}, {"c": "丁", "yy": "阴", "wx": "火", "yi": "灯烛星光，温和内敛，主智慧、细腻与温情"}, {"c": "戊", "yy": "阳", "wx": "土", "yi": "高山厚土，稳固厚重，主诚信、承载与守成"}, {"c": "己", "yy": "阴", "wx": "土", "yi": "田园之土，滋养包容，主细腻、培育与谦和"}, {"c": "庚", "yy": "阳", "wx": "金", "yi": "刀剑之金，刚硬果决，主变革、魄力与肃杀"}, {"c": "辛", "yy": "阴", "wx": "金", "yi": "珠玉之金，精细敏锐，主贵气、雕琢与规则"}, {"c": "壬", "yy": "阳", "wx": "水", "yi": "江河之水，奔流不息，主智慧、包容与通达"}, {"c": "癸", "yy": "阴", "wx": "水", "yi": "雨露之水，滋润细腻，主隐秘、渗透与灵性"}], "zhi": [{"c": "子", "yy": "阳", "wx": "水", "sx": "鼠", "month": "十一月", "hour": "23-1时", "yi": "冬至一阳生，主开端、智慧与潜藏"}, {"c": "丑", "yy": "阴", "wx": "土", "sx": "牛", "month": "十二月", "hour": "1-3时", "yi": "寒土藏金，主沉稳、积蓄与坚持"}, {"c": "寅", "yy": "阳", "wx": "木", "sx": "虎", "month": "正月", "hour": "3-5时", "yi": "三阳开泰，主新生、行动与勇猛"}, {"c": "卯", "yy": "阴", "wx": "木", "sx": "兔", "month": "二月", "hour": "5-7时", "yi": "春木繁盛，主柔美、生长与亲和"}, {"c": "辰", "yy": "阳", "wx": "土", "sx": "龙", "month": "三月", "hour": "7-9时", "yi": "水库湿土，主变化、包容与腾跃"}, {"c": "巳", "yy": "阴", "wx": "火", "sx": "蛇", "month": "四月", "hour": "9-11时", "yi": "巳火初旺，主灵动、谋略与蜕变"}, {"c": "午", "yy": "阳", "wx": "火", "sx": "马", "month": "五月", "hour": "11-13时", "yi": "火极而盛，主光明、热情与奔放"}, {"c": "未", "yy": "阴", "wx": "土", "sx": "羊", "month": "六月", "hour": "13-15时", "yi": "燥土生金，主温和、收获与温顺"}, {"c": "申", "yy": "阳", "wx": "金", "sx": "猴", "month": "七月", "hour": "15-17时", "yi": "金气始肃，主果决、变革与机敏"}, {"c": "酉", "yy": "阴", "wx": "金", "sx": "鸡", "month": "八月", "hour": "17-19时", "yi": "金气纯正，主精细、贵气与守信"}, {"c": "戌", "yy": "阳", "wx": "土", "sx": "狗", "month": "九月", "hour": "19-21时", "yi": "火库燥土，主忠诚、收束与守护"}, {"c": "亥", "yy": "阴", "wx": "水", "sx": "猪", "month": "十月", "hour": "21-23时", "yi": "水藏木生，主智慧、包容与富足"}], "wuxing": ["木", "火", "土", "金", "水"], "wxColor": {"木": "#2e7d5b", "火": "#b03a2e", "土": "#b8923a", "金": "#9a8a5a", "水": "#2e5f8a"}, "sheng": {"木": "火", "火": "土", "土": "金", "金": "水", "水": "木"}, "ke": {"木": "土", "土": "水", "水": "火", "火": "金", "金": "木"}, "shishen": {"比肩": {"yi": "主动进取、广结善缘、自立自强", "ji": "与人争强、刚愎自用、破财耗力"}, "劫财": {"yi": "合作共赢、借力而行、和气生财", "ji": "财务外借、冲动消费、人际纠纷"}, "食神": {"yi": "创作表达、享受生活、以才生财", "ji": "安逸懈怠、贪图享乐、口腹之欲"}, "伤官": {"yi": "创新求变、展现才华、突破陈规", "ji": "锋芒外露、口舌是非、顶撞权威"}, "正财": {"yi": "踏实工作、稳健理财、量入为出", "ji": "投机取巧、好高骛远、财来财去"}, "偏财": {"yi": "把握机遇、广开财路、人情往来", "ji": "孤注一掷、投机赌博、财多身弱"}, "正官": {"yi": "守正担当、尽职尽责、争取名声", "ji": "压力过载、畏首畏尾、官非口舌"}, "七杀": {"yi": "果断决策、迎难而上、化压力为动力", "ji": "急躁冲动、意气用事、树敌招险"}, "正印": {"yi": "进修学习、求助长辈、静心充电", "ji": "依赖他人、懒于行动、闭门造车"}, "偏印": {"yi": "独立思考、钻研玄思、独辟蹊径", "ji": "孤僻多虑、钻牛角尖、离群索居"}}, "foot": "天干地支、五行生克、六十甲子为通行历法常识；十神与运势解读为编者所注，仅供娱乐参考。"};
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const GAN = DATA.gan.map(g=>g.c);
+const ZHI = DATA.zhi.map(z=>z.c);
+const GM = {}; DATA.gan.forEach(g=>GM[g.c]=g);
+const ZM = {}; DATA.zhi.forEach(z=>ZM[z.c]=z);
+const SHENG = DATA.sheng, KE = DATA.ke, SS = DATA.shishen;
+const WXC = DATA.wxColor;
+const wxTag = wx => `<span class="tag" style="background:${WXC[wx]}">${wx}</span>`;
+
+// header / hero
+$('#h1').textContent = DATA.title;
+$('#bagua').textContent = DATA.hero.bagua;
+$('#heroTitle').textContent = DATA.hero.title;
+$('#heroLead').textContent = DATA.hero.lead;
+$('#heroNote').textContent = DATA.hero.note;
+$('#foot').textContent = DATA.foot;
+
+// overview
+$('#ov').innerHTML = `
+<p><b>天干地支</b>简称「干支」，是古人用来记录时间的一套符号系统，也是中华历法、命理与中医的理论基础。</p>
+<p><b>十天干</b>（甲乙丙丁戊己庚辛壬癸）与<b>十二地支</b>（子丑寅卯辰巳午未申酉戌亥）两两相配，构成<b>六十甲子</b>，六十年一循环，用来纪年、纪月、纪日、纪时。</p>
+<p>天干地支各自分<b>阴阳</b>、配<b>五行</b>（木火土金水），五行之间有<b>相生</b>（木生火、火生土、土生金、金生水、水生木）与<b>相克</b>（木克土、土克水、水克火、火克金、金克木）的关系。</p>
+<p>用出生年月日时排出<b>四柱八字</b>，再以日柱天干（<b>日主</b>）对照流年、流月，即可推演「每年走什么运、每月注意什么」。</p>`;
+
+// 天干
+$('#ganGrid').innerHTML = DATA.gan.map(g=>`
+  <div class="gz"><div class="c" style="color:${WXC[g.wx]}">${g.c}</div>
+    <div class="tags"><span class="tag" style="background:${WXC[g.wx]}">${g.wx}</span><span class="tag" style="background:${g.yy==='阳'?'#b03a2e':'#2e5f8a'}">${g.yy}</span></div>
+    <div class="yi">${esc(g.yi)}</div></div>`).join('');
+
+// 地支
+$('#zhiGrid').innerHTML = DATA.zhi.map(z=>`
+  <div class="gz"><div class="c" style="color:${WXC[z.wx]}">${z.c}</div>
+    <div class="tags"><span class="tag" style="background:${WXC[z.wx]}">${z.wx}</span><span class="tag" style="background:${z.yy==='阳'?'#b03a2e':'#2e5f8a'}">${z.yy}</span></div>
+    <div class="sx">🐾 ${z.sx} · ${z.month} · ${z.hour}</div>
+    <div class="yi">${esc(z.yi)}</div></div>`).join('');
+
+// 五行生克
+function wxFlow(arr, arrow){
+  return arr.map((w,i)=>`${i?'<span class="wx-arrow">'+arrow+'</span>':''}<span class="wx-chip" style="background:${WXC[w]}">${w}</span>`).join('');
+}
+$('#wxWrap').innerHTML = `
+  <div class="wx-row"><div class="lbl">相生 · 木 → 火 → 土 → 金 → 水 → 木</div>
+    <div class="wx-flow">${wxFlow(['木','火','土','金','水','木'],'生')}</div></div>
+  <div class="wx-row"><div class="lbl">相克 · 木 → 土 → 水 → 火 → 金 → 木</div>
+    <div class="wx-flow">${wxFlow(['木','土','水','火','金','木'],'克')}</div></div>`;
+
+// 六十甲子
+const jzList = [];
+for(let i=0;i<60;i++) jzList.push(GAN[i%10]+ZHI[i%12]);
+$('#jzGrid').innerHTML = jzList.map((gz,i)=>`
+  <div class="jz" style="color:${WXC[GM[gz[0]].wx]}"><span class="n">${i+1}</span>${gz}</div>`).join('');
+
+// 纪法说明
+$('#jifa').innerHTML = `
+  <div class="card"><b>纪年</b><p>以立春为界，六十年一轮。如 2024 年为<b>甲辰</b>年，2025 年为<b>乙巳</b>年。年干支由「(公历年 − 4) 取余」推算。</p></div>
+  <div class="card"><b>纪月</b><p>以节气划分，正月为<b>寅月</b>，二月卯月……腊月丑月。月干由年干「五虎遁」推定，如甲己之年正月为<b>丙寅</b>。</p></div>
+  <div class="card"><b>纪日</b><p>以 1900 年 1 月 1 日（<b>甲戌日</b>）为基准，按天数差推算，六十日一轮。</p></div>
+  <div class="card"><b>纪时</b><p>一日十二时辰，子时 23–1 时、丑时 1–3 时……亥时 21–23 时。时干由日干「五鼠遁」推定，如甲己之日子时为<b>甲子</b>。</p></div>`;
+
+/* ============ 个人测算 ============ */
+// 月支顺序（正月寅 … 腊月丑）
+const MONTH_ORDER = ["寅","卯","辰","巳","午","未","申","酉","戌","亥","子","丑"];
+const MONTH_ZHI = {1:"丑",2:"寅",3:"卯",4:"辰",5:"巳",6:"午",7:"未",8:"申",9:"酉",10:"戌",11:"亥",12:"子"};
+const HUTIGER = {甲:"丙",乙:"戊",丙:"庚",丁:"壬",戊:"甲",己:"丙",庚:"戊",辛:"庚",壬:"壬",癸:"甲"};
+const HURAT   = {甲:"甲",乙:"丙",丙:"戊",丁:"庚",戊:"壬",己:"甲",庚:"丙",辛:"戊",壬:"庚",癸:"壬"};
+const HOURS = [["","时辰未知"],["23","子时 23-1"],["1","丑时 1-3"],["3","寅时 3-5"],["5","卯时 5-7"],["7","辰时 7-9"],["9","巳时 9-11"],["11","午时 11-13"],["13","未时 13-15"],["15","申时 15-17"],["17","酉时 17-19"],["19","戌时 19-21"],["21","亥时 21-23"]];
+
+// 初始化表单
+const now = new Date();
+$('#inM').innerHTML = Array.from({length:12},(_,i)=>`<option value="${i+1}">${i+1} 月</option>`).join('');
+$('#inH').innerHTML = HOURS.map(h=>`<option value="${h[0]}">${h[1]}</option>`).join('');
+$('#yearSel').innerHTML = (()=>{let s='';for(let y=now.getFullYear()-3;y<=now.getFullYear()+10;y++)s+=`<option value="${y}"${y===now.getFullYear()?' selected':''}>${y} 年</option>`;return s;})();
+
+// 干支计算
+const mod = (n,m)=>((n%m)+m)%m;
+function yearGZ(y){ return {gan:GAN[mod(y-4,10)], zhi:ZHI[mod(y-4,12)]}; }
+function dayGZ(y,m,d){
+  const days = Math.round((Date.UTC(y,m-1,d) - Date.UTC(1900,0,1)) / 86400000);
+  const idx = mod(days+10,60);
+  return {gan:GAN[idx%10], zhi:ZHI[idx%12]};
+}
+function monthGZ(yearStem, m){
+  const zhi = MONTH_ZHI[m];
+  const base = GAN.indexOf(HUTIGER[yearStem]);
+  const k = MONTH_ORDER.indexOf(zhi);
+  return {gan:GAN[mod(base+k,10)], zhi};
+}
+function hourGZ(dayStem, h){
+  const zi = Math.floor((+h+1)/2) % 12;
+  const base = GAN.indexOf(HURAT[dayStem]);
+  return {gan:GAN[mod(base+zi,10)], zhi:ZHI[zi]};
+}
+function shiShen(day, other){
+  const dw = GM[day].wx, ow = GM[other].wx;
+  const same = GM[day].yy === GM[other].yy;
+  if(ow===dw) return same?"比肩":"劫财";
+  if(SHENG[dw]===ow) return same?"食神":"伤官";
+  if(SHENG[ow]===dw) return same?"偏印":"正印";
+  if(KE[ow]===dw) return same?"七杀":"正官";
+  if(KE[dw]===ow) return same?"偏财":"正财";
+  return "比肩";
+}
+
+let BAZI = null;
+function calcBazi(y,m,d,h){
+  let ey = y;
+  if(m===1 || (m===2 && d<4)) ey = y-1;   // 立春约 2/4，之前归上年
+  const yg = yearGZ(ey);
+  const mg = monthGZ(yg.gan, m);
+  const dg = dayGZ(y,m,d);
+  const hg = h!=="" ? hourGZ(dg.gan, +h) : null;
+  return {yg, mg, dg, hg, master: dg.gan};
+}
+
+$('#calcBtn').addEventListener('click', ()=>{
+  const y = +$('#inY').value, m = +$('#inM').value, d = +$('#inD').value, h = $('#inH').value;
+  if(!y || !m || !d){ alert('请完整填写出生年月日'); return; }
+  if(y<1900||y>2100){ alert('年份需在 1900–2100 之间'); return; }
+  BAZI = calcBazi(y,m,d,h);
+  renderBazi();
+});
+
+function pillarHtml(label, p, isMaster){
+  return `<div class="pillar${isMaster?' day-master':''}">
+    <div class="pl">${label}</div>
+    <div class="gz"><span class="g">${p.gan}</span><span class="z">${p.zhi}</span></div>
+    <div class="meta">${GM[p.gan].wx}${GM[p.gan].yy} · ${ZM[p.zhi].sx}</div>
+    ${isMaster?'<span class="dm">日主</span>':''}
+  </div>`;
+}
+
+function renderBazi(){
+  const b = BAZI;
+  $('#pillars').innerHTML =
+    pillarHtml('年柱', b.yg, false) + pillarHtml('月柱', b.mg, false) +
+    pillarHtml('日柱', b.dg, true) +
+    (b.hg ? pillarHtml('时柱', b.hg, false) : `<div class="pillar"><div class="pl">时柱</div><div class="gz"><span style="font-size:16px;color:var(--sub)">未填</span></div><div class="meta">可补时辰</div></div>`);
+
+  // 五行分布
+  const cnt = {木:0,火:0,土:0,金:0,水:0};
+  [b.yg,b.mg,b.dg].forEach(p=>{cnt[GM[p.gan].wx]++;cnt[ZM[p.zhi].wx]++;});
+  if(b.hg){cnt[GM[b.hg.gan].wx]++;cnt[ZM[b.hg.zhi].wx]++;}
+  const maxV = Math.max(...DATA.wuxing.map(w=>cnt[w]));
+  const missing = DATA.wuxing.filter(w=>cnt[w]===0);
+  $('#wxDist').innerHTML = `
+    <div style="font-size:13px;font-weight:700;color:var(--ink)">五行分布（共 ${4+(b.hg?4:0)} 字 → ${6+(b.hg?2:0)} 字）</div>
+    <div class="bars">${DATA.wuxing.map(w=>`
+      <div class="bar"><div class="lb" style="color:${WXC[w]}">${w}</div>
+        <div class="tr"><i style="width:${(cnt[w]/maxV*100).toFixed(0)}%;background:${WXC[w]}"></i></div>
+        <div class="ct">${cnt[w]}</div></div>`).join('')}</div>
+    <div class="miss">${missing.length?`五行<b>缺${missing.join('、')}</b>，可在日常着装、饮食、方位上适当补益（娱乐参考）。`:`五行俱全，较为均衡。`}</div>`;
+
+  $('#bazi').classList.add('show');
+  $('#lnSec').style.display = '';
+  $('#lmSec').style.display = '';
+  renderLiuNian();
+  renderLiuYue();
+  $('#lnSec').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function renderLiuNian(){
+  const b = BAZI, y = +$('#yearSel').value;
+  const gz = yearGZ(y);
+  const ss = shiShen(b.master, gz.gan);
+  const taiji = (gz.zhi === b.yg.zhi);
+  $('#lnCard').innerHTML = `
+    <div class="ln-top">
+      <div class="ln-gz"><span class="g">${gz.gan}</span><span class="z">${gz.zhi}</span> 年</div>
+      <span class="ln-ss">${ss}</span>
+    </div>
+    <div class="ln-sub">天干 ${gz.gan}（${GM[gz.gan].wx}${GM[gz.gan].yy}）· 地支 ${gz.zhi}（${ZM[gz.zhi].sx}·${ZM[gz.zhi].wx}）${taiji?' · ⚠️ 值太岁（本命年）':''}</div>
+    <div class="ln-body">
+      <div class="row">流年天干「${gz.gan}」对日主「${b.master}」为 <b>${ss}</b>。</div>
+      <div class="row"><b>宜：</b>${esc(SS[ss].yi)}。</div>
+      <div class="row ji"><b>忌：</b>${esc(SS[ss].ji)}。</div>
+      ${taiji?'<div class="row ji"><b>提醒：</b>本年地支与出生年支相同（值太岁），宜低调谨慎、守成为上。</div>':''}
+    </div>`;
+}
+$('#yearSel').addEventListener('change', ()=>{ if(BAZI) renderLiuNian(); });
+
+function renderLiuYue(){
+  const b = BAZI, y = +$('#yearSel').value;
+  const ys = yearGZ(y).gan;
+  const base = GAN.indexOf(HUTIGER[ys]);
+  $('#lmGrid').innerHTML = MONTH_ORDER.map((zhi,i)=>{
+    const gan = GAN[mod(base+i,10)];
+    const ss = shiShen(b.master, gan);
+    return `<div class="lm">
+      <div class="lm-top"><span class="lm-m">${ZM[zhi].month}</span><span class="lm-gz"><span class="g">${gan}</span><span class="z">${zhi}</span></span></div>
+      <div class="lm-ss">${ss}</div>
+      <div class="lm-t">${ZM[zhi].sx} · ${ZM[zhi].wx} · <b>宜</b>${esc(SS[ss].yi)}；<span class="ji"><b>忌</b>${esc(SS[ss].ji)}</span></div>
+    </div>`;
+  }).join('');
+}
+
+/* ============ tab 切换 ============ */
+document.querySelectorAll('#nav button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('#nav button').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+    $('#view-'+btn.dataset.v).classList.add('on');
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+});
+</script>
+</body>
+</html>
